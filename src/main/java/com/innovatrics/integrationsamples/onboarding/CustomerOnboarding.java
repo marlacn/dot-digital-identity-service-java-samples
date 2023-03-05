@@ -87,6 +87,16 @@ public class CustomerOnboarding {
                 return;
             }
 
+
+            Face faceId = getDetectionImage();
+            FaceMaskResponse faceMaskResponse = faceApi.checkFaceMask(faceId);
+            boolean maskDetected = faceMaskResponse.getScore() > configuration.WEARABLES_FACE_MASK_THRESHOLD;
+            GetCustomerResponse getCustomerResponse = customerApi.getCustomer(customerId);
+            int age = getCustomerResponse.getAge();
+            if (maskDetected && age >= 18)
+                LOG.info("Customer is eligible");
+            else LOG.info("Customer is not eligible");
+
             LOG.info("Customer: " + customer);
 
             ImageCrop frontPage = customerOnboardingApi.documentPageCrop(customerId, "front", null, null);
